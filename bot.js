@@ -1,21 +1,21 @@
+require("dotenv").config();
+
 const TelegramBot = require("node-telegram-bot-api");
-const token = "6730355881:AAF09tFWDsk5nn89LIDW6kiZQ5ZCzGtXn-Y";
-const bot = new TelegramBot(token, { polling: true });
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
 const axios = require("axios");
 
 // Exchange rate API
-const API_KEY = "b51456f299c6894e8fa659ce";
-const API_URL = "https://api.exchangerate-api.com/v4/latest/";
+const EXCHANGE_API_URL = "https://api.exchangerate-api.com/v4/latest/";
 
 // Weather API
-const WEATHER_API_KEY = "867b0b8796b9b9c03435a6067e4582eb";
 const WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/weather";
 
 const convertCurrency = async (amount, fromCurrency, toCurrency) => {
   try {
     const response = await axios.get(
-      `${API_URL}${fromCurrency}?apiKey=${API_KEY}`
+      `${EXCHANGE_API_URL}${fromCurrency}?apiKey=${process.env.EXCHANGE_API_KEY}`
     );
     const rate = response.data.rates[toCurrency];
     if (!rate) {
@@ -34,7 +34,7 @@ const convertCurrency = async (amount, fromCurrency, toCurrency) => {
 const getWeather = async (city) => {
   try {
     const response = await axios.get(
-      `${WEATHER_API_URL}?q=${city}&appid=${WEATHER_API_KEY}&units=metric`
+      `${WEATHER_API_URL}?q=${city}&appid=${process.env.WEATHER_API_KEY}&units=metric`
     );
     const { weather, main } = response.data;
     return `The weather in ${city} is ${weather[0].description} with a temperature of ${main.temp}°C.`;
@@ -43,6 +43,7 @@ const getWeather = async (city) => {
     throw error;
   }
 };
+
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
 
